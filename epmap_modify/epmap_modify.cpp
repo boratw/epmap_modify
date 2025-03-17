@@ -1,7 +1,6 @@
 ﻿
 #include <iostream>
 #include <fstream>
-#include <windows.h>
 
 using namespace std;
 typedef wchar_t wchar;
@@ -10,12 +9,14 @@ int wmain(int argc, const wchar* argv[])
 {
     if (argc > 1)
     {
-        if (wcslen(argv[1]) < 6)
+        size_t len = wcslen(argv[1]);
+        if (len < 6)
             return -1;
-        if (wcscmp(argv[1] + (wcslen(argv[1]) - 6), L".epmap") != 0)
+        if (wcscmp(argv[1] + (len - 6), L".epmap") != 0)
             return -1;
         wchar output_temp[256];
-        swprintf_s(output_temp, L"%s.tmp", argv[1]);
+        wcsncpy_s(output_temp, argv[1], len - 6);
+        wcscat_s(output_temp, L".m.epmap");
 
         wifstream ifs(argv[1]);
         if(ifs.fail())
@@ -53,13 +54,7 @@ int wmain(int argc, const wchar* argv[])
         ifs.close();
         ofs.close();
 
-        ifs = wifstream(output_temp);
-        if(ifs.fail())
-            return -1;
-        ifs.close();
 
-        DeleteFile(argv[1]);
-        MoveFile(output_temp, argv[1]);
     }
     return 0;
 }
